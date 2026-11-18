@@ -54,7 +54,7 @@ typedef enum {
 /* ---------------------------------------------------------------- keys */
 typedef enum {
     K_UP, K_DOWN, K_LEFT, K_RIGHT,
-    K_A, K_B, K_X, K_Y,
+    K_A, K_B, K_X, K_Y, K_T, K_S,
     K_L, K_R, K_L2, K_R2,
     K_START, K_SELECT,
 } Key;

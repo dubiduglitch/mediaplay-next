@@ -12,6 +12,6 @@ mediaplay-next itself is the code in `src/`. The binary links these components:
 
 ## What this means
 
-- mediaplay-next's own code is **AGPL-3.0-or-later** (see LICENSE).
+- mediaplay-next's own code is **GPL-3.0-or-later** (see LICENSE).
 - FFmpeg is built **without** `--enable-gpl` and `--enable-nonfree`, so it stays LGPL.
 - For private use on your own console nothing needs to be published.

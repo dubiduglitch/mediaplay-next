@@ -58,5 +58,5 @@ Or use the goodluckOS Buildroot cross-toolchain (same as the rest of the OS).
 
 ## License
 
-GNU AGPL-3.0-or-later (see LICENSE). FFmpeg is LGPL-2.1+; SDL2_mixer is zlib/libpng-style.
+GNU GPL-3.0-or-later (see LICENSE). FFmpeg is LGPL-2.1+; SDL2_mixer is zlib/libpng-style.
 See NOTICE.md.
