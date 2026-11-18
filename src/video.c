@@ -75,6 +75,88 @@ static char v_sub_text[512] = {0};
 /* subtitle track (external .srt) */
 static int v_sub_on = 1;
 static int v_sub_track = -1;
+static double v_sub_offset = 0;   /* seconds, S5: ±10 s by 100 ms steps */
+
+#define SUB_MAX 256
+typedef struct { double start, end; char text[512]; } SubEntry;
+static SubEntry v_subs[SUB_MAX];
+static int v_nsubs = 0;
+static int v_sub_loaded = 0;
+
+/* ---------------------------------------------------------------- subtitles */
+static double sub_parse_time(const char *s) {
+    int h = 0, m = 0, s = 0, ms = 0;
+    if (sscanf(s, "%d:%d:%d,%d", &h, &m, &s, &ms) == 4)
+        return h * 3600.0 + m * 60.0 + s + ms / 1000.0;
+    if (sscanf(s, "%d:%d:%d.%d", &h, &m, &s, &ms) == 4)
+        return h * 3600.0 + m * 60.0 + s + ms / 1000.0;
+    return -1;
+}
+
+static void sub_load(const char *path) {
+    v_nsubs = 0;
+    v_sub_loaded = 0;
+    if (!path || !v_sub_on) return;
+    char srt[1024];
+    snprintf(srt, sizeof srt, "%s", path);
+    char *dot = strrchr(srt, '.');
+    if (dot) snprintf(dot, sizeof srt - (dot - srt), ".srt");
+    else { snprintf(srt + strlen(srt), sizeof srt - strlen(srt), ".srt"); }
+    FILE *f = fopen(srt, "r");
+    if (!f) return;
+    char line[1024];
+    while (v_nsubs < SUB_MAX && fgets(line, sizeof line, f)) {
+        /* skip index line */
+        if (line[0] < '0' || line[0] > '9') continue;
+        char *arrow = strstr(line, "-->");
+        if (!arrow) continue;
+        char start[64] = {0}, end[64] = {0};
+        int n1 = arrow - line;
+        if (n1 > 63) n1 = 63;
+        memcpy(start, line, n1);
+        char *rest = arrow + 3;
+        int n2 = 0;
+        while (*rest && *rest != '\r' && *rest != '\n' && n2 < 63) { end[n2++] = *rest++; }
+        end[n2] = 0;
+        double st = sub_parse_time(start);
+        double en = sub_parse_time(end);
+        if (st < 0 || en < 0) continue;
+        /* read text lines until blank */
+        char *tp = v_subs[v_nsubs].text;
+        int left = sizeof v_subs[v_nsubs].text;
+        tp[0] = 0;
+        while (fgets(line, sizeof line, f)) {
+            if (line[0] == '\r' || line[0] == '\n' || line[0] == 0) break;
+            int l = strlen(line);
+            while (l && (line[l-1]=='\n'||line[l-1]=='\r')) line[--l]=0;
+            int add = snprintf(tp, left, "%s%s%s", tp[0]?" ":"", line, tp[0]?"":"");
+            if (add < 0) add = 0;
+            tp += add > left ? left : add;
+            left -= add > left ? left : add;
+            if (left <= 1) break;
+        }
+        v_subs[v_nsubs].start = st;
+        v_subs[v_nsubs].end = en;
+        v_nsubs++;
+    }
+    fclose(f);
+    v_sub_loaded = 1;
+}
+
+static const char *sub_get_text(double t) {
+    if (!v_sub_on || !v_sub_loaded || v_nsubs == 0) return NULL;
+    double tt = t + v_sub_offset;
+    for (int i = 0; i < v_nsubs; i++)
+        if (tt >= v_subs[i].start && tt < v_subs[i].end)
+            return v_subs[i].text;
+    return NULL;
+}
+
+static void sub_offset_step(int dir) {
+    v_sub_offset += dir * 0.1;
+    if (v_sub_offset > 10.0) v_sub_offset = 10.0;
+    if (v_sub_offset < -10.0) v_sub_offset = -10.0;
+}
 
 /* speed */
 static const double speeds[] = {0.5, 1.0, 1.5, 2.0};
@@ -393,6 +475,7 @@ static int v_open(const char *path) {
         if (!v_tex || !v_rgb) { snprintf(video_err, sizeof video_err, "%s", TX(X_ERR_VTEX)); goto fail; }
     }
 
+    sub_load(path);
     v_start_buffering(0.0);
     int rs = config_resume_get(path);
     if (rs >= 10 && (video_dur <= 0 || rs < video_dur - 30)) {
@@ -583,10 +666,13 @@ void video_draw(void) {
         if (!video_fit) SDL_RenderCopy(R, v_tex, NULL, &dst);
         else SDL_RenderCopy(R, v_tex, NULL, &dst);
     }
-    /* subtitle text placeholder */
-    if (v_sub_on && v_sub_text[0]) {
-        ui_fill_rr(20, H - 100, W - 40, 40, 10, (SDL_Color){0, 0, 0, 160}, 200);
-        ui_draw_text_center(f_small, v_sub_text, W / 2, H - 75, C_TEXT, W - 80);
+    /* subtitle text */
+    {
+        const char *st = sub_get_text(v_get_clock());
+        if (v_sub_on && st && st[0]) {
+            ui_fill_rr(20, H - 100, W - 40, 40, 10, (SDL_Color){0, 0, 0, 160}, 200);
+            ui_draw_text_center(f_small, st, W / 2, H - 75, C_TEXT, W - 80);
+        }
     }
     /* HUD */
     Uint32 now = SDL_GetTicks();

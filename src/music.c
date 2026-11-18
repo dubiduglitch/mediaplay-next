@@ -52,7 +52,7 @@ int music_track_open(const char *path) {
     }
     music_open = 1;
     music_paused = 0;
-    if (Mix_PlayMusic(cur_music, 1) == -1) {
+    if (Mix_PlayMusic(cur_music, 0) == -1) {   /* 0 = play once; repetition handled by track_step */
         snprintf(play_err, sizeof play_err, "%s", TX(X_ERR_AUDIO));
         Mix_FreeMusic(cur_music);
         cur_music = NULL;
