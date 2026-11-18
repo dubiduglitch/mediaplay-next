@@ -1,0 +1,4 @@
+#ifndef AVUTIL_IMGUTILS_STUB_H
+#define AVUTIL_IMGUTILS_STUB_H
+enum { AV_CHAN_LAYOUT_UNSPEC=0 };
+#endif

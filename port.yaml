@@ -1,0 +1,31 @@
+title: Media Player
+catalog: 50
+summary: Music and video player for goodluckOS (MP3/FLAC/OGG/WAV + MKV/MP4/AVI).
+tags: [media, music, video, player]
+status: playable
+review: draft
+accent: "#58a6ff"
+added: 2026-11-18
+icon: icon.png
+
+engine:
+  name: mediaplay-next
+  url: https://github.com/dubiduglitch/mediaplay-next
+  license: AGPL-3.0-or-later
+
+data:
+  kind: none
+
+controls:
+  - { button: dpad, action: "Navigate" }
+  - { button: A, action: "Open / play-pause" }
+  - { button: B, action: "Back / exit" }
+  - { button: X, action: "Shuffle (music) / fit-fill (video)" }
+  - { button: Y, action: "Repeat (music) / start-over (video)" }
+  - { button: L/R, action: "Prev/next track or 1-min seek (video)" }
+  - { button: Start, action: "Now playing" }
+  - { button: Select, action: "Stop / back" }
+
+licenses:
+  - LICENSE
+  - NOTICE.md

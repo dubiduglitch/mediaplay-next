@@ -1,0 +1,8 @@
+# mediaplay-next: music + video player for goodluckOS / Kennel.
+# Install as /home/player/.local/share/applications/mediaplay.puppy
+[ENTRY]
+CATEGORY=Media
+NAME=Media Player
+DESCRIPTION=Music (MP3/FLAC/OGG/WAV) + Video (MKV/MP4/AVI) player
+COMMAND=/home/player/ports/mediaplay/mediaplay
+ICON=icon.png
