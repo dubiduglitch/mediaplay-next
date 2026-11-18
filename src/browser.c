@@ -195,6 +195,21 @@ void browser_go_up(void) {
     browser_select_path(prev);
 }
 
+static int list_clamp(void);
+
+/* Page up/down in the browser list (dir = +1 down, -1 up). */
+void browser_page(int dir) {
+    if (nent == 0) return;
+    int rv = list_clamp();
+    int step = rv > 0 ? rv : 1;
+    int target = sel + dir * step;
+    if (target < 0) target = 0;
+    if (target >= nent) target = nent - 1;
+    sel = target;
+    /* recompute to keep topi consistent */
+    list_clamp();
+}
+
 #define ROW_H 40
 #define HOME_H 66
 #define LIST_Y 62

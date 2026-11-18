@@ -67,8 +67,8 @@ void input_handle_event(const SDL_Event *ev) {
         }
         break;
     case SDL_CONTROLLERAXISMOTION:
-        if (ev->caxis_axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT && ev->caxis_value > 16000) handle_key(K_L2);
-        if (ev->caxis_axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && ev->caxis_value > 16000) handle_key(K_R2);
+        if (ev->caxis_axis == SDL_CONTROLLER_AXIS_TRIGGERLEFT && ev->caxis_value > 16000) handle_key(K_T);
+        if (ev->caxis_axis == SDL_CONTROLLER_AXIS_TRIGGERRIGHT && ev->caxis_value > 16000) handle_key(K_S);
         break;
     case SDL_KEYDOWN:
         switch (ev->key_keysym) {

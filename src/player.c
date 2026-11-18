@@ -90,16 +90,19 @@ static void handle_key(Key k) {
         switch (k) {
         case K_UP:
             if (scr == S_HOME) { if (sel > 0) sel--; else sel = nent - 1; }
-            else { /* browse list */ }
+            else { /* S_BROWSE */ if (sel > 0) sel--; else sel = nent - 1; }
             break;
         case K_DOWN:
             if (scr == S_HOME) { if (sel < nent - 1) sel++; else sel = 0; }
+            else { /* S_BROWSE */ if (sel < nent - 1) sel++; else sel = 0; }
             break;
         case K_L: case K_LEFT:
-            if (k == K_L && scr == S_HOME) { sel -= 1; if (sel < 0) sel = 0; }
+            if (scr == S_HOME) { sel -= 1; if (sel < 0) sel = nent - 1; }
+            else { /* page up in browser */ browser_page(-1); }
             break;
         case K_R: case K_RIGHT:
-            if (k == K_R && scr == S_HOME) { sel += 1; if (sel >= nent) sel = nent - 1; }
+            if (scr == S_HOME) { sel += 1; if (sel >= nent) sel = 0; }
+            else { /* page down in browser */ browser_page(1); }
             break;
         case K_A:
             if (scr == S_HOME) {

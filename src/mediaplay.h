@@ -201,6 +201,7 @@ void browser_show_roots(void);
 void browser_open_category(int c);
 int  browser_is_root(const char *p);
 void browser_go_up(void);
+void browser_page(int dir);
 void browser_select_path(const char *path);
 const char *browser_base_name(const char *p);
 
